@@ -16,7 +16,7 @@ def open_data(path="data/clients.csv"):
 
 st.title('EDA проект Надежды Гераськиной')
 
-st.markdown('## Узнаем профиль типичного клиента банка')
+'## Узнаем профиль типичного клиента банка'
 
 
 df = open_data()
@@ -36,7 +36,7 @@ with col1:
 with col2:
     st.write('По возрасту')
     # fig = plt.figure(figsize=(10, 4))
-    fig = px.histogram(df, x='AGE')
+    fig = px.histogram(df, x='AGE', color = 'CNT_TARGET')
     fig.add_annotation(x=60, y=410,
                        text=f"Среднее = {df.AGE.mean():0.1f}",
                        showarrow=False, )
@@ -46,14 +46,17 @@ with col2:
     st.plotly_chart(fig, use_container_width=True)
     # fig = sns.histplot(x="AGE", data=df, kde = True)
     # st.pyplot(fig.plot)
-st.markdown('''
+'''
     Мужчин почти в 2 раза больше женщин, в основном состоящие в браке (как и женщины в основном замужем)
+    
     Возраст варьируется от 21 до 65 лет, в среднем клиенты банка 40 летние 
     
-''')
+    Распределение тех, кто откликнулся на маркетинговую капманию похоже на общее распределение, аномалий нет
+    
+'''
 
 'По образованию'
-fig = px.histogram(df, x='EDUCATION', category_orders={
+fig = px.histogram(df, x='EDUCATION', color = 'CNT_TARGET', category_orders={
     'EDUCATION': ['Неполное среднее', 'Среднее', 'Среднее специальное',
                   'Неоконченное высшее', 'Высшее', 'Два и более высших образования',
                   'Ученая степень']})
@@ -68,15 +71,26 @@ value_counts.columns = ['GEN_INDUSTRY', 'count']
 # Sort the DataFrame by count in ascending order
 sorted_value_counts = value_counts.sort_values(by='count', ascending=True)
 
-# Create a histogram using Plotly Express
-fig = px.histogram(df, y='GEN_INDUSTRY', category_orders={'GEN_INDUSTRY': sorted_value_counts['GEN_INDUSTRY'].tolist()})
+grouped = df.groupby(['GEN_INDUSTRY', 'CNT_TARGET']).count()[['EDUCATION']].reset_index()
+grouped = grouped.merge(df.groupby(['GEN_INDUSTRY']).count()[['EDUCATION']].reset_index(), on = 'GEN_INDUSTRY')
 
+grouped = grouped.sort_values(by='EDUCATION_y', ascending=True)
+
+grouped['TARGET_SHARE'] = (grouped['EDUCATION_x'] / grouped['EDUCATION_y']).round(2)
+grouped['TARGET_SHARE'] = grouped['TARGET_SHARE'].apply(lambda x: f'{x:0.0%}')
+grouped = grouped[grouped.CNT_TARGET == 1]
+grouped = grouped.sort_values(by='EDUCATION_y', ascending=False)
+
+# Create a histogram using Plotly Express
+fig = px.histogram(df, y='GEN_INDUSTRY', color = 'CNT_TARGET', category_orders={'GEN_INDUSTRY': sorted_value_counts['GEN_INDUSTRY'].tolist()})
+fig.data[1].text = grouped['TARGET_SHARE']
+fig.update_traces(textposition='outside', textfont_size=14)
 st.plotly_chart(fig, use_container_width=True)
 
 'Больше всего людей, берущих кредит, работают в торговле'
 'Это интересный инсайт, так как возможно они берут в кредит те товары, которыми потом торгуют'
 'Также много клиентов работает на гос.службе или в мед. учреждениях, что может свидетельствовать о том, что их доходы не высоки (раз они берут кредиты), но их заработок стабилен, так как они с уверенностью могут закрыть кредит'
-
+'Что касается отклика на маркетинговую компанию, то есть в целом распределение похоже на исходное (без раскраски по целевой переменной), откликнувшихся 10-15% во всех многочисленных категориях'
 
 'На каких должностях работают клиенты'
 value_counts = df['GEN_TITLE'].value_counts().reset_index()
@@ -86,14 +100,14 @@ value_counts.columns = ['GEN_TITLE', 'count']
 sorted_value_counts = value_counts.sort_values(by='count', ascending=True)
 
 # Create a histogram using Plotly Express
-fig = px.histogram(df, y='GEN_TITLE', category_orders={'GEN_TITLE': sorted_value_counts['GEN_TITLE'].tolist()})
+fig = px.histogram(df, y='GEN_TITLE', color = 'CNT_TARGET', category_orders={'GEN_TITLE': sorted_value_counts['GEN_TITLE'].tolist()})
 st.plotly_chart(fig, use_container_width=True)
 'Напрашивается вывод, что чем ниже должность, тем больше люди берут кредиты, чтот логично, от должность напрямую зависит доход клиента и его потребность в кредита'
 
 
 'Распределение семейного дохода среди клиентов'
 
-fig = px.histogram(df, x='FAMILY_INCOME', category_orders={'FAMILY_INCOME': ['до 5000 руб.', 'от 5000 до 10000 руб.',
+fig = px.histogram(df, x='FAMILY_INCOME', color = 'CNT_TARGET', category_orders={'FAMILY_INCOME': ['до 5000 руб.', 'от 5000 до 10000 руб.',
                                                                              'от 10000 до 20000 руб.','от 20000 до 50000 руб.',
                                                                              'свыше 50000 руб.'
                                                                              ]})
@@ -105,11 +119,12 @@ st.plotly_chart(fig, use_container_width=True)
 
 
 st.write('Какая кредитная история у клиентов')
-fig = px.histogram(df, x='CLOSED_LOANS')
+fig = px.histogram(df, x='CLOSED_LOANS', color = 'CNT_TARGET')
 st.plotly_chart(fig, use_container_width=True)
-'Итак, типичный клиент банка - это мужчина в браке 40 лет, скорее всего у него не было еще закрытых кредитов в жизни'
 
-'## Сколько людей откликается на маркетинговые предложения'
+
+
+'## Исследование связи признаков с целевой переменной (отклик на маркетинговую кампанию)'
 col1, col2, col3 = st.columns(3)
 with col1:
     st.write('Мужчины')
@@ -124,13 +139,14 @@ with col3:
     fig = px.pie(df, 'CNT_TARGET')
     st.plotly_chart(fig, use_container_width=True)
 
-st.markdown('В среднем 12% людей откликается на маркетинговые предложения ')
-st.markdown(
-    '*Строит отметить, что в задании не прописано, что все люди из таблицы получили маркетинговые предложения (иногда смс и письма могут не дойти), может те, у кого 0, и не получали рассылки*')
+'В среднем 12% людей откликнулось на маркетинговые предложения'
+'Данные цифры подртверждаются графиками из первого раздела, не удалось выявить необычной зависимости таргета от категориальных признаков'
+'В следующем разделе попробуем найтивзаимосвязи среди вещественных признаков'
 
 
 
-st.markdown('## Корреляция числовых признаков')
+
+'## Корреляция числовых признаков'
 
 corr = df.corr(numeric_only=True)
 
@@ -140,14 +156,15 @@ max_corr = max(corr.abs().max())
 fig = px.imshow(corr, text_auto=True, color_continuous_scale=color_scale, zmin=-max_corr, zmax=max_corr,)
 st.plotly_chart(fig, use_container_width=True)
 
-st.markdown('Более скоррелированные признаки это:')
-st.markdown('* Срок кредита и сумма кредита\n')
-st.markdown('* Сумма кредита и первый платеж\n')
-st.markdown('* Кол-во детей и кол-во иждивенцев\n')
-st.markdown('Все эти зависимости вполне логичны\n')
-st.markdown('Наблюдается несильная положительная связь дохода и суммы кредита, стоит проверить, почему корреляция всего 0.3 (кажется, что связь должна быть повыше)')
-st.markdown('Также любопытным является то, что возраст немного антикоррелирует с количеством иждивенцев, и немного коррелирует с количеством детей, когда кол-во детей и иждивенцев коррелируют (хоть и не сильно)')
+'Более скоррелированные признаки это:'
+'* Срок кредита и сумма кредита\n'
+'* Сумма кредита и первый платеж\n'
+'* Кол-во детей и кол-во иждивенцев\n'
+'Все эти зависимости вполне логичны\n'
+'Наблюдается несильная положительная связь дохода и суммы кредита, стоит проверить, почему корреляция всего 0.3 (кажется, что связь должна быть повыше)'
+'Также любопытным является то, что возраст немного антикоррелирует с количеством иждивенцев, и немного коррелирует с количеством детей, когда кол-во детей и иждивенцев коррелируют (хоть и не сильно)'
 
+'*Целевая переменная не коррелирует ни с одним числовым признаком*'
 
 fig = px.scatter(df, x='PERSONAL_INCOME', y = 'CREDIT')
 st.plotly_chart(fig, use_container_width=True)
