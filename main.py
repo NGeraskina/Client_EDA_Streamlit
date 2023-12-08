@@ -184,6 +184,7 @@ st.plotly_chart(fig, use_container_width=True)
 st.write('### Какая кредитная история у клиентов')
 fig = px.histogram(df, x='CLOSED_LOANS', color='CNT_TARGET')
 st.plotly_chart(fig, use_container_width=True)
+'Большинство клиентов впервые в своей жизни берут кредит, отклик на маркетинговую рассылку не зависит от кредитной истории'
 
 '## Исследование связи признаков с целевой переменной (отклик на маркетинговую кампанию)'
 col1, col2, col3 = st.columns(3)
