@@ -21,16 +21,16 @@ df = open_data()
 st.dataframe(df.describe(), use_container_width=True)
 st.dataframe(df.describe(include='object'), use_container_width=True)
 
-st.write('Распределение клиентов')
+st.write('### Распределение клиентов')
 col1, col2 = st.columns(2)
 
 with col1:
-    st.write('По полу')
+    st.write('#### По полу')
     fig = px.histogram(df, x='GENDER', color='MARITAL_STATUS')
     st.plotly_chart(fig, use_container_width=True)
 
 with col2:
-    st.write('По возрасту')
+    st.write('#### По возрасту')
     # fig = px.histogram(df, x='AGE', color = 'CNT_TARGET')
     # fig.add_annotation(x=60, y=410,
     #                    text=f"Среднее = {df.AGE.mean():0.1f}",
@@ -55,13 +55,13 @@ with col2:
 '''
     Мужчин почти в 2 раза больше женщин, в основном состоящие в браке (как и женщины в основном замужем)
     
-    Возраст варьируется от 21 до 67 лет, в среднем клиенты банка 39 летние 
+    Возраст варьируется от 21 до 67 лет, медианный возраст клиента банка - 39 лет 
     
-    Распределение тех, кто откликнулся на маркетинговую капманию похоже на общее распределение, аномалий нет, но можно отметить, что люди, откликнувшиеся на кампанию, немного моложе
+    Распределение тех, кто откликнулся на маркетинговую капманию похоже на общее распределение, аномалий нет, но можно отметить, что люди, откликнувшиеся на кампанию, моложе
     
 '''
 
-'По образованию'
+'#### По образованию'
 fig = px.histogram(df, x='EDUCATION', color='CNT_TARGET', category_orders={
     'EDUCATION': ['Неполное среднее', 'Среднее', 'Среднее специальное',
                   'Неоконченное высшее', 'Высшее', 'Два и более высших образования',
@@ -71,7 +71,7 @@ st.plotly_chart(fig, use_container_width=True)
 'Чаще кредиты берут люди без высшего образования'
 
 
-'В какой области работают клиенты банка'
+'### В какой области работают клиенты банка'
 value_counts = df['GEN_INDUSTRY'].value_counts().reset_index()
 value_counts.columns = ['GEN_INDUSTRY', 'count']
 
@@ -100,7 +100,7 @@ st.plotly_chart(fig, use_container_width=True)
 'Также много клиентов работает на гос.службе или в мед. учреждениях, что может свидетельствовать о том, что их доходы не высоки (раз они берут кредиты), но их заработок стабилен, так как они с уверенностью могут закрыть кредит'
 'Что касается отклика на маркетинговую компанию, то есть в целом распределение похоже на исходное (без раскраски по целевой переменной), откликнувшихся 10-15% во всех многочисленных категориях'
 
-'На каких должностях работают клиенты'
+'### На каких должностях работают клиенты'
 value_counts = df['GEN_TITLE'].value_counts().reset_index()
 value_counts.columns = ['GEN_TITLE', 'count']
 
@@ -113,7 +113,7 @@ fig = px.histogram(df, y='GEN_TITLE', color='CNT_TARGET',
 st.plotly_chart(fig, use_container_width=True)
 'Напрашивается вывод, что чем ниже должность, тем больше люди берут кредиты, чтот логично, от должность напрямую зависит доход клиента и его потребность в кредита'
 
-'Распределение семейного дохода среди клиентов'
+'### Распределение семейного дохода среди клиентов'
 
 fig = px.histogram(df, x='FAMILY_INCOME', color='CNT_TARGET',
                    category_orders={'FAMILY_INCOME': ['до 5000 руб.', 'от 5000 до 10000 руб.',
@@ -126,22 +126,22 @@ st.plotly_chart(fig, use_container_width=True)
 'Люди с семейным доходом ниже МРОТ с меньшей вероятностью смогут выплатить кредит, поэтому и банк редко выдает им кредиты'
 'Людям с семейным доходом выше 50к рублей кредиты редко нужны, чаще всего на что-то дорогостоящее (например, на машину)'
 
-st.write('Какая кредитная история у клиентов')
+st.write('### Какая кредитная история у клиентов')
 fig = px.histogram(df, x='CLOSED_LOANS', color='CNT_TARGET')
 st.plotly_chart(fig, use_container_width=True)
 
 '## Исследование связи признаков с целевой переменной (отклик на маркетинговую кампанию)'
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.write('Мужчины')
+    st.write('#### Мужчины')
     fig = px.pie(df[df.GENDER == 'Мужчина'], 'CNT_TARGET')
     st.plotly_chart(fig, use_container_width=True)
 with col2:
-    st.write('Женщины')
+    st.write('#### Женщины')
     fig = px.pie(df[df.GENDER == 'Женщина'], 'CNT_TARGET')
     st.plotly_chart(fig, use_container_width=True)
 with col3:
-    st.write('Вне зависимости от пола')
+    st.write('#### Вне зависимости от пола')
     fig = px.pie(df, 'CNT_TARGET')
     st.plotly_chart(fig, use_container_width=True)
 
@@ -149,10 +149,10 @@ with col3:
 'Данные цифры подртверждаются графиками из первого раздела, не удалось выявить необычной зависимости таргета от категориальных признаков'
 'В следующем разделе попробуем найтивзаимосвязи среди вещественных признаков'
 
-'Посмотрим процент клиентов по статусам'
+'### Посмотрим процент клиентов по статусам'
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.write('Нахождение на пенсии')
+    st.write('#### Нахождение на пенсии')
     fig = px.histogram(df, 'status_pens', color = 'CNT_TARGET')
 
     grouped = df.groupby(['status_pens', 'CNT_TARGET']).count()['AGE'].reset_index()
@@ -163,7 +163,7 @@ with col1:
     fig.update_traces(textposition='outside', textfont_size=14)
     st.plotly_chart(fig, use_container_width=True)
 with col2:
-    st.write('Трудоустроенность')
+    st.write('#### Трудоустроенность')
     fig = px.histogram(df, 'status_work', color = 'CNT_TARGET')
     grouped = df.groupby(['status_work', 'CNT_TARGET']).count()['AGE'].reset_index()
 
@@ -174,7 +174,7 @@ with col2:
     fig.update_traces(textposition='outside', textfont_size=14)
     st.plotly_chart(fig, use_container_width=True)
 with col3:
-    st.write('Владение квартирой')
+    st.write('#### Владение квартирой')
     fig = px.histogram(df, 'FL_PRESENCE_FL', color = 'CNT_TARGET')
     grouped = df.groupby(['FL_PRESENCE_FL', 'CNT_TARGET']).count()['AGE'].reset_index()
 
