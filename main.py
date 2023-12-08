@@ -57,21 +57,49 @@ with col2:
     
     Возраст варьируется от 21 до 67 лет, медианный возраст клиента банка - 39 лет 
     
-    Распределение тех, кто откликнулся на маркетинговую капманию похоже на общее распределение, аномалий нет, но можно отметить, что люди, откликнувшиеся на кампанию, моложе
+    Распределение тех, кто откликнулся на маркетинговую кампанию похоже на общее распределение, аномалий нет, но можно отметить, что люди, откликнувшиеся на кампанию, моложе
     
 '''
+
+'> Далее на графики выведу процент откликнувшихся на маркетинговую кампанию по различным срезам'
 
 '#### По образованию'
 fig = px.histogram(df, x='EDUCATION', color='CNT_TARGET', category_orders={
     'EDUCATION': ['Неполное среднее', 'Среднее', 'Среднее специальное',
                   'Неоконченное высшее', 'Высшее', 'Два и более высших образования',
                   'Ученая степень']})
+
+value_counts = df['EDUCATION'].value_counts().reset_index()
+value_counts.columns = ['EDUCATION', 'count']
+
+# Sort the DataFrame by count in ascending order
+sorted_value_counts = value_counts.sort_values(by='count', ascending=True)
+
+grouped = df.groupby(['EDUCATION', 'CNT_TARGET']).count()[['GEN_INDUSTRY']].reset_index()
+grouped = grouped.merge(df.groupby(['EDUCATION']).count()[['GEN_INDUSTRY']].reset_index(), on='EDUCATION')
+
+grouped = grouped.sort_values(by='GEN_INDUSTRY_y', ascending=True)
+
+grouped['TARGET_SHARE'] = (grouped['GEN_INDUSTRY_x'] / grouped['GEN_INDUSTRY_y']).round(2)
+grouped['TARGET_SHARE'] = grouped['TARGET_SHARE'].apply(lambda x: f'{x:0.0%}')
+grouped = grouped[grouped.CNT_TARGET == 1]
+dict_edu = {'Неполное среднее':0, 'Среднее':1, 'Среднее специальное':2,
+                  'Неоконченное высшее':3, 'Высшее':4, 'Два и более высших образования':5,
+                  'Ученая степень':6}
+grouped['sort'] = grouped['EDUCATION'].map(dict_edu)
+grouped = grouped.sort_values(by='sort', ascending=True)
+print(grouped)
+
+fig.data[1].text = grouped['TARGET_SHARE']
+fig.update_traces(textposition='outside', textfont_size=14)
+
 st.plotly_chart(fig, use_container_width=True)
 
 'Чаще кредиты берут люди без высшего образования'
 
 
 '### В какой области работают клиенты банка'
+
 value_counts = df['GEN_INDUSTRY'].value_counts().reset_index()
 value_counts.columns = ['GEN_INDUSTRY', 'count']
 
@@ -120,7 +148,34 @@ fig = px.histogram(df, x='FAMILY_INCOME', color='CNT_TARGET',
                                                       'от 10000 до 20000 руб.', 'от 20000 до 50000 руб.',
                                                       'свыше 50000 руб.'
                                                       ]})
+
+value_counts = df['FAMILY_INCOME'].value_counts().reset_index()
+value_counts.columns = ['FAMILY_INCOME', 'count']
+
+# Sort the DataFrame by count in ascending order
+sorted_value_counts = value_counts.sort_values(by='count', ascending=True)
+
+grouped = df.groupby(['FAMILY_INCOME', 'CNT_TARGET']).count()[['GEN_INDUSTRY']].reset_index()
+grouped = grouped.merge(df.groupby(['FAMILY_INCOME']).count()[['GEN_INDUSTRY']].reset_index(), on='FAMILY_INCOME')
+
+grouped = grouped.sort_values(by='GEN_INDUSTRY_y', ascending=True)
+
+grouped['TARGET_SHARE'] = (grouped['GEN_INDUSTRY_x'] / grouped['GEN_INDUSTRY_y']).round(2)
+grouped['TARGET_SHARE'] = grouped['TARGET_SHARE'].apply(lambda x: f'{x:0.0%}')
+grouped = grouped[grouped.CNT_TARGET == 1]
+dict_edu = {'до 5000 руб.':0, 'от 5000 до 10000 руб.':1,
+                                                      'от 10000 до 20000 руб.':2, 'от 20000 до 50000 руб.':3,
+                                                      'свыше 50000 руб.':4}
+grouped['sort'] = grouped['FAMILY_INCOME'].map(dict_edu)
+grouped = grouped.sort_values(by='sort', ascending=True)
+print(grouped)
+
+fig.data[1].text = grouped['TARGET_SHARE']
+fig.update_traces(textposition='outside', textfont_size=14)
+
+
 st.plotly_chart(fig, use_container_width=True)
+
 'Кредиты берут люди с доходом около уровня МРОТ и выше до 2*МРОТ'
 'Это также логично, ведь люди с таким доходом не могут позволить себе дорогостоящие покупки, поэтому берут кредит, а поскольку (см.выше) они работают в гос. учреждениях, то они способны ганатировано закрыть кредит'
 'Люди с семейным доходом ниже МРОТ с меньшей вероятностью смогут выплатить кредит, поэтому и банк редко выдает им кредиты'
