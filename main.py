@@ -12,7 +12,9 @@ def open_data(path="data/clients.csv"):
     return df
 
 
-st.title('EDA проект Надежды Гераськиной')
+st.title('EDA проект: исследование клиентов банка')
+
+'Создатель: Надежда Гераськина, МОВС-2023'
 
 '## Узнаем профиль типичного клиента банка'
 
@@ -197,7 +199,7 @@ with col2:
     fig = px.pie(df[df.GENDER == 'Женщина'], 'CNT_TARGET')
     st.plotly_chart(fig, use_container_width=True)
 with col3:
-    st.write('#### Вне зависимости от пола')
+    st.write('#### Всего')
     fig = px.pie(df, 'CNT_TARGET')
     st.plotly_chart(fig, use_container_width=True)
 
@@ -206,7 +208,7 @@ with col3:
 'В следующем разделе попробуем найтивзаимосвязи среди вещественных признаков'
 
 '### Посмотрим процент клиентов по статусам'
-col1, col2, col3 = st.columns(3)
+col1, col2= st.columns(2)
 with col1:
     st.write('#### Нахождение на пенсии')
     fig = px.histogram(df, 'status_pens', color = 'CNT_TARGET')
@@ -220,26 +222,28 @@ with col1:
     st.plotly_chart(fig, use_container_width=True)
 with col2:
     st.write('#### Трудоустроенность')
-    fig = px.histogram(df, 'status_work', color = 'CNT_TARGET')
+    fig = px.histogram(df, 'status_work', color='CNT_TARGET')
     grouped = df.groupby(['status_work', 'CNT_TARGET']).count()['AGE'].reset_index()
 
     fig.data[1].text = [
         f"{grouped[(grouped.status_work == 'работает') & (grouped.CNT_TARGET == 1)]['AGE'].sum() / grouped[(grouped.status_work == 'работает')]['AGE'].sum():0.2%}",
         f"{grouped[(grouped.status_work == 'не работает') & (grouped.CNT_TARGET == 1)]['AGE'].sum() / grouped[(grouped.status_work == 'не работает')]['AGE'].sum():0.2%}",
-        ]
-    fig.update_traces(textposition='outside', textfont_size=14)
-    st.plotly_chart(fig, use_container_width=True)
-with col3:
-    st.write('#### Владение квартирой')
-    fig = px.histogram(df, 'FL_PRESENCE_FL', color = 'CNT_TARGET')
-    grouped = df.groupby(['FL_PRESENCE_FL', 'CNT_TARGET']).count()['AGE'].reset_index()
-
-    fig.data[1].text = [
-        f"{grouped[(grouped.FL_PRESENCE_FL == 'Есть') & (grouped.CNT_TARGET == 1)]['AGE'].sum() / grouped[(grouped.FL_PRESENCE_FL == 'Есть')]['AGE'].sum():0.2%}",
-        f"{grouped[(grouped.FL_PRESENCE_FL == 'Нет') & (grouped.CNT_TARGET == 1)]['AGE'].sum() / grouped[(grouped.FL_PRESENCE_FL == 'Нет')]['AGE'].sum():0.2%}",
     ]
     fig.update_traces(textposition='outside', textfont_size=14)
     st.plotly_chart(fig, use_container_width=True)
+
+
+
+st.write('#### Владение квартирой')
+fig = px.histogram(df, 'FL_PRESENCE_FL', color = 'CNT_TARGET')
+grouped = df.groupby(['FL_PRESENCE_FL', 'CNT_TARGET']).count()['AGE'].reset_index()
+
+fig.data[1].text = [
+    f"{grouped[(grouped.FL_PRESENCE_FL == 'Есть') & (grouped.CNT_TARGET == 1)]['AGE'].sum() / grouped[(grouped.FL_PRESENCE_FL == 'Есть')]['AGE'].sum():0.2%}",
+    f"{grouped[(grouped.FL_PRESENCE_FL == 'Нет') & (grouped.CNT_TARGET == 1)]['AGE'].sum() / grouped[(grouped.FL_PRESENCE_FL == 'Нет')]['AGE'].sum():0.2%}",
+]
+fig.update_traces(textposition='outside', textfont_size=14)
+st.plotly_chart(fig, use_container_width=True)
 
 f'Большинство клиентов не на пенсии и работают, работающих пенсионеров всего {df[(df.status_pens == "пенсионер") & (df.status_work == "работает")].shape[0]}'
 'Квартирой владеет примерно 70% клиентов, так что кредит они берут скорее всего не на покупку квартиры'
