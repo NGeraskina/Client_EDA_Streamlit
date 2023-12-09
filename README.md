@@ -1,6 +1,6 @@
 # Streamlit EDA проект: исследование клиентов банка
 
-Просмотр приложения [here](https://clienteda.streamlit.app/)!
+Просмотр приложения [здесь](https://clienteda.streamlit.app/)!
 
 ## Файлы
 
