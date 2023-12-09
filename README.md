@@ -1,13 +1,25 @@
-# API ветклиники на FastAPI
+# Streamlit EDA проект: исследование клиентов банка
 
-Создатель: Гераськина Надежда, студентка МОВС2023
+Try app [here](https://clienteda.streamlit.app/)!
 
-Данный проект разработан для ветклиники "N", которой было необходимо:
-1. фиксировать время авторизации оператора в базе данных
-2. просматривать собачек по породам и ключам
-3. добавлять собачек в бд
-4. изменять данные собачек в бд по ключам
+## Files
 
-Все вышеперечисленные функции удалось реализовать на фреймворке FastAPI
+- `main.py`: streamlit app file
+- `data/clients.csv` and `model_weights.mw`: data file and pre-trained model
+- `requirements.txt`: package requirements files
+- 'db/data_preparation.py'
+- 'db/insert_data_to_psgr.py'
 
-Задеплоенный проект находится [по этой ссылке](https://vetclinics.onrender.com/)
+## Run Demo Locally 
+
+### Shell
+
+For directly run streamlit locally in the repo root folder as follows:
+
+```shell
+$ python -m venv venv
+$ source venv/bin/activate
+$ pip install -r requirements.txt
+$ streamlit run app.py
+```
+Open http://localhost:8501 to view the app.
