@@ -2,7 +2,7 @@
 
 Просмотр приложения [здесь](https://clienteda.streamlit.app/)!
 
-Postgres БД находится на [neon.tech](https://neon.tech/)!
+Postgres БД находится на [neon.tech](https://neon.tech/)
 
 ## Файлы
 
