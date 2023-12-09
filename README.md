@@ -1,8 +1,8 @@
 # Streamlit EDA проект: исследование клиентов банка
 
-Try app [here](https://clienteda.streamlit.app/)!
+Просмотр приложения [here](https://clienteda.streamlit.app/)!
 
-## Files
+## Файлы
 
 - `main.py`: streamlit app file
 - `data/clients.csv` and `model_weights.mw`: data file and pre-trained model
@@ -10,11 +10,11 @@ Try app [here](https://clienteda.streamlit.app/)!
 - 'db/data_preparation.py'
 - 'db/insert_data_to_psgr.py'
 
-## Run Demo Locally 
+## Запуск приложения локально 
 
-### Shell
+### Консоль
 
-For directly run streamlit locally in the repo root folder as follows:
+Для запуска streamlit локально в репозитории сделайте следующие команды
 
 ```shell
 $ python -m venv venv
@@ -22,4 +22,4 @@ $ source venv/bin/activate
 $ pip install -r requirements.txt
 $ streamlit run app.py
 ```
-Open http://localhost:8501 to view the app.
+Приложение заработает на http://localhost:8501
